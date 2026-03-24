@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Librarium - Inicio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="site-logo">
+        LIBR<span>ARIUM</span>
+      </a>
+      
+      <nav class="main-nav">
+        <a href="index.html" class="active">Inicio</a>
+        <a href="catalog.html">Catálogo</a>
+        <a href="catalog.html?type=manga">Manga</a>
+        <a href="catalog.html?type=novel">Novelas</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="search-form">
+          <input type="text" id="searchInput" class="search-input" placeholder="Buscar por título..." oninput="handleSearch()">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <main class="main-content">
+      <div class="hero-section">
+         <h2 class="section-title">Últimas Actualizaciones</h2>
+         <div class="manga-grid" id="booksGrid">
+           <!-- Renderizado por script.js -->
+         </div>
+      </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="widget">
+        <h3 class="widget-title">Top Semanal</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">(Ranking dinámico disponible con backend)</p>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-title">Explorar Géneros</h3>
+        <ul class="genre-list">
+          <li><a href="catalog.html?genre=Fantasía">Fantasía</a></li>
+          <li><a href="catalog.html?genre=Isekai">Isekai</a></li>
+          <li><a href="catalog.html?genre=Romance">Romance</a></li>
+          <li><a href="catalog.html?genre=Acción">Acción</a></li>
+          <li><a href="catalog.html?genre=Drama">Drama</a></li>
+          <li><a href="catalog.html?genre=Ciencia Ficción">Sci-Fi</a></li>
+          <li><a href="catalog.html?genre=Misterio">Misterio</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <p>© 2024 Librarium Manga. Todos los derechos reservados.</p>
+  </footer>
+
+  <script src="assets/js/script.js"></script>
+</body>
+</html>
