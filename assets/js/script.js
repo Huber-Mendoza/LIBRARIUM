@@ -28,60 +28,79 @@ function renderBooks() {
     return matchGenre && matchSearch;
   });
 
-  grid.innerHTML = filtered.map((b, i) => `
-    <div class="book-card" style="animation-delay: ${i * 0.1}s" onclick="openBookModal(${b.id})">
-      <div class="book-cover" style="--cover-color: ${b.color};">
-        <div class="cover-bg" style="background: ${b.color};"></div>
-        <div class="cover-pattern"></div>
-        <div class="cover-spine"></div>
-        <div class="cover-content">
-          <div class="cover-ornament">✦</div>
-          <div class="cover-title">${b.title}</div>
-          <div class="cover-author">— ${b.author} —</div>
+  if (filtered.length === 0) {
+    grid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-secondary);">No se encontraron resultados.</p>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(b => {
+    // Madara Cover Image parsing (URL or linear gradient fallback)
+    let bgStyle = b.cover.startsWith('http') 
+        ? `background-image: url('${b.cover}');` 
+        : `background: ${b.cover};`;
+
+    return `
+    <div class="manga-card">
+      <div class="manga-cover" style="${bgStyle}" onclick="openBookModal(${b.id})">
+        <div class="manga-badge">HOT</div>
+        <div class="manga-rating">★ ${b.stars}.0</div>
+      </div>
+      <div class="manga-info">
+        <div class="manga-title" onclick="openBookModal(${b.id})">${b.title}</div>
+        <div class="chapter-item">
+          <a href="#" class="chapter-link">Capítulo ${b.chapters}</a>
+          <span>hace 1 día</span>
         </div>
       </div>
-      <div class="stars">${'★'.repeat(b.stars)}${'☆'.repeat(5-b.stars)}</div>
-      <div class="book-card-title">${b.title}</div>
-      <div class="book-card-author">${b.author}</div>
-      <div class="book-card-genre">${b.genre.toUpperCase()} · ${b.year}</div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
-function filterBooks() {
+function filterSearch() {
   searchTerm = document.getElementById('searchInput').value;
   renderBooks();
 }
 
-function filterGenre(genre) {
-  activeGenre = activeGenre === genre ? null : genre;
+function filterGenre(genreElement, genre) {
+  // Toggle genre
+  if (activeGenre === genre) {
+    activeGenre = null;
+    genreElement.classList.remove('active');
+  } else {
+    activeGenre = genre;
+    document.querySelectorAll('.genre-list li').forEach(li => li.classList.remove('active'));
+    genreElement.classList.add('active');
+  }
+  
   searchTerm = '';
   document.getElementById('searchInput').value = '';
-  document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
   renderBooks();
 }
 
 function openBookModal(id) {
   const b = books.find(x => x.id === id);
   if (!b) return;
+
+  let bgStyle = b.cover.startsWith('http') 
+        ? `background-image: url('${b.cover}');` 
+        : `background: ${b.cover};`;
+
   document.getElementById('modal-book-content').innerHTML = `
-    <p class="featured-badge" style="margin-bottom:1.2rem;">✦ ${b.genre.toUpperCase()}</p>
-    <h2 class="featured-title" style="font-size:1.8rem; margin-bottom:0.5rem;">${b.title}</h2>
-    <p class="featured-author">por ${b.author}</p>
-    <div class="stars" style="margin:1rem 0;">${'★'.repeat(b.stars)}${'☆'.repeat(5-b.stars)}</div>
-    <div class="featured-meta" style="margin-bottom:1.5rem;">
-      <div class="meta-item"><span class="meta-label">PÁGINAS</span><span class="meta-value">${b.pages}</span></div>
-      <div class="meta-item"><span class="meta-label">AÑO</span><span class="meta-value">${b.year}</span></div>
+    <div class="modal-cover" style="${bgStyle}"></div>
+    <div class="modal-details">
+      <h2 class="modal-title">${b.title}</h2>
+      <div class="modal-meta">
+        <span>${b.genre}</span>
+        <span>★ ${b.stars}.0</span>
+        <span>${b.year}</span>
+        <span>${b.chapters} Capítulos</span>
+      </div>
+      <p style="color: var(--accent); font-weight: 600; margin-bottom: 1rem;">Autor: ${b.author}</p>
+      <p class="modal-desc">${b.description}</p>
+      <a href="#" class="read-btn">Leer Primer Capítulo</a>
     </div>
-    <p class="featured-desc">${b.description}</p>
-    <a href="#" class="btn filled">Comenzar a leer</a>
   `;
   document.getElementById('modal-book').classList.add('open');
-}
-
-function openModal(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.add('open');
 }
 
 function closeModal(event, id) {
@@ -90,21 +109,10 @@ function closeModal(event, id) {
   }
 }
 
-// ── SCROLL PROGRESS ──
-window.addEventListener('scroll', () => {
-  const scrollTop = window.scrollY;
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const progressBar = document.getElementById('progressBar');
-  if (progressBar) progressBar.style.width = (scrollTop / docHeight * 100) + '%';
-});
+function directCloseModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
 
-// ── SCROLL REVEAL ──
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-
-// Initialize when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   fetchBooks();
 });

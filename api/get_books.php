@@ -1,28 +1,26 @@
 <?php
 // api/get_books.php
-
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
 require_once '../config/database.php';
 
 try {
-    $stmt = $pdo->prepare("SELECT id, title, author, genre, pages, publish_year as year, stars, color, description FROM books ORDER BY id ASC");
+    $stmt = $pdo->prepare("SELECT id, title, author, genre, pages as chapters, publish_year as year, stars, cover, description FROM books ORDER BY id DESC");
     $stmt->execute();
     
     $books = $stmt->fetchAll();
     
-    // Ensure properly typed output
     $formatted_books = array_map(function($book) {
         return [
             'id' => (int)$book['id'],
             'title' => $book['title'],
             'author' => $book['author'],
             'genre' => $book['genre'],
-            'pages' => (int)$book['pages'],
+            'chapters' => (int)$book['chapters'], // we use chapters in Madara theme
             'year' => (int)$book['year'],
             'stars' => (int)$book['stars'],
-            'color' => $book['color'],
+            'cover' => $book['cover'],
             'description' => $book['description']
         ];
     }, $books);

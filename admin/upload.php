@@ -8,22 +8,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $author = $_POST['author'] ?? '';
     $genre = $_POST['genre'] ?? '';
-    $pages = (int)($_POST['pages'] ?? 0);
+    $chapters = (int)($_POST['chapters'] ?? 0);
     $year = (int)($_POST['year'] ?? 0);
     $stars = (int)($_POST['stars'] ?? 0);
-    $color = $_POST['color'] ?? 'linear-gradient(160deg,#1a0e2e,#4a1a6b)';
+    $cover = $_POST['cover'] ?? '';
     $description = $_POST['description'] ?? '';
 
-    if ($title && $author && $genre && $description) {
+    if ($title && $author && $genre && $description && $cover) {
         try {
-            $stmt = $pdo->prepare("INSERT INTO books (title, author, genre, pages, publish_year, stars, color, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $author, $genre, $pages, $year, $stars, $color, $description]);
-            $message = "<div class='success'>¡Novela añadida exitosamente al catálogo!</div>";
+            $stmt = $pdo->prepare("INSERT INTO books (title, author, genre, pages, publish_year, stars, cover, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $author, $genre, $chapters, $year, $stars, $cover, $description]);
+            $message = "<div class='success'>¡Proyecto añadido exitosamente!</div>";
         } catch (PDOException $e) {
-            $message = "<div class='error'>Error al añadir la novela: " . $e->getMessage() . "</div>";
+            $message = "<div class='error'>Error al añadir: " . $e->getMessage() . "</div>";
         }
     } else {
-        $message = "<div class='error'>Por favor, completa todos los campos requeridos.</div>";
+        $message = "<div class='error'>Por favor, completa todos los campos requeridos, incluyendo la portada.</div>";
     }
 }
 ?>
@@ -31,67 +31,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Librarium - Panel de Administración</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+  <title>Admin - Madara Upload</title>
   <style>
     :root {
-      --ink: #1a1209;
-      --parchment: #f5ede0;
-      --gold: #b8882a;
-      --border: rgba(184,136,42,0.4);
+      --bg: #16151d;
+      --card: #1f1f1f;
+      --text: #cccccc;
+      --accent: #eb3349;
+      --border: #333;
     }
     body {
-      background-color: var(--ink);
-      color: var(--parchment);
-      font-family: 'Cormorant Garamond', serif;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
       margin: 0; padding: 0;
     }
     .admin-container {
-      max-width: 800px;
+      max-width: 700px;
       margin: 4rem auto;
-      padding: 3rem;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
+      padding: 2.5rem;
+      background: var(--card);
+      border-radius: 8px;
     }
     h1 {
-      font-family: 'Cinzel', serif;
       text-align: center;
-      color: var(--gold);
+      color: #fff;
       margin-bottom: 2rem;
     }
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
     }
     label {
       display: block;
-      font-family: 'Cinzel', serif;
-      font-size: 0.8rem;
-      letter-spacing: 0.1em;
-      color: var(--gold);
-      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 0.4rem;
     }
     input, select, textarea {
       width: 100%;
-      background: rgba(255,255,255,0.05);
+      background: #111;
       border: 1px solid var(--border);
       padding: 0.8rem;
-      color: var(--parchment);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem;
+      color: #fff;
+      border-radius: 4px;
       outline: none;
       box-sizing: border-box;
     }
     input:focus, select:focus, textarea:focus {
-      border-color: var(--gold);
+      border-color: var(--accent);
     }
     .btn {
-      font-family: 'Cinzel', serif;
       padding: 1rem 2rem;
-      background: var(--gold);
-      color: var(--ink);
+      background: var(--accent);
+      color: #fff;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 1rem;
+      font-weight: bold;
       width: 100%;
       margin-top: 1rem;
       transition: opacity 0.3s;
@@ -99,42 +95,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .btn:hover {
       opacity: 0.9;
     }
-    .success {
-      background: rgba(46, 139, 87, 0.2);
-      border: 1px solid #2e8b57;
-      color: #98fb98;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    .error {
-      background: rgba(178, 34, 34, 0.2);
-      border: 1px solid #b22222;
-      color: #ff9999;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    .back-link {
-        display: block;
-        text-align: center;
-        margin-top: 2rem;
-        color: var(--gold);
-        text-decoration: none;
-        font-family: 'Cinzel', serif;
-        font-size: 0.8rem;
-    }
+    .success { color: #5cb85c; padding: 1rem; margin-bottom: 1rem; background: rgba(92,184,92,0.1); border-left: 4px solid #5cb85c; }
+    .error { color: #d9534f; padding: 1rem; margin-bottom: 1rem; background: rgba(217,83,79,0.1); border-left: 4px solid #d9534f; }
+    .back-link { display: block; text-align: center; margin-top: 2rem; color: var(--accent); text-decoration: none; }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="admin-container">
-    <h1>✦ Añadir Nueva Novela ✦</h1>
+    <h1>Añadir Nuevo Manga/Novela</h1>
     
     <?php echo $message; ?>
 
     <form method="POST" action="">
       <div class="form-group">
-        <label>Título de la Novela *</label>
+        <label>Título *</label>
         <input type="text" name="title" required>
       </div>
 
@@ -146,46 +121,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div class="form-group">
           <label>Género *</label>
-          <select name="genre" required style="color: black;">
+          <select name="genre" required>
+            <option value="Acción">Acción</option>
             <option value="Fantasía">Fantasía</option>
             <option value="Romance">Romance</option>
-            <option value="Misterio">Misterio</option>
-            <option value="Ciencia Ficción">Ciencia Ficción</option>
+            <option value="Isekai">Isekai</option>
             <option value="Drama">Drama</option>
-            <option value="Terror">Terror</option>
-            <option value="Histórica">Histórica</option>
-            <option value="Contemporánea">Contemporánea</option>
+            <option value="Misterio">Misterio</option>
+            <option value="Sci-Fi">Sci-Fi</option>
           </select>
         </div>
         
         <div class="form-group">
-          <label>Valoración (Estrellas)</label>
-          <select name="stars" style="color: black;">
-            <option value="5">5 Estrellas</option>
-            <option value="4">4 Estrellas</option>
-            <option value="3">3 Estrellas</option>
-            <option value="2">2 Estrellas</option>
-            <option value="1">1 Estrella</option>
+          <label>Valoración</label>
+          <select name="stars">
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="1">★☆☆☆☆</option>
           </select>
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div class="form-group">
-          <label>Número de Páginas</label>
-          <input type="number" name="pages" value="300">
+          <label>Capítulos / Páginas</label>
+          <input type="number" name="chapters" value="1">
         </div>
         
         <div class="form-group">
-          <label>Año de Publicación</label>
+          <label>Año</label>
           <input type="number" name="year" value="2024">
         </div>
       </div>
 
       <div class="form-group">
-        <label>Color de Portada (CSS Gradient o Color)</label>
-        <input type="text" name="color" value="linear-gradient(160deg,#1a0e2e,#4a1a6b)">
-        <small style="opacity: 0.6; font-size: 0.9rem;">Ejemplo: linear-gradient(160deg, #2e0d1a, #6b1a3a)</small>
+        <label>URL de la Portada * (Imagen JPG/PNG o CSS Gradient)</label>
+        <input type="text" name="cover" value="" placeholder="https://ejemplo.com/cover.jpg" required>
       </div>
 
       <div class="form-group">
@@ -193,10 +166,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea name="description" rows="5" required></textarea>
       </div>
 
-      <button type="submit" class="btn">Subir Novela</button>
+      <button type="submit" class="btn">Publicar Manga / Novela</button>
     </form>
     
-    <a href="../index.php" class="back-link">← Volver a la Biblioteca</a>
+    <a href="../index.php" class="back-link">← Volver al Inicio</a>
   </div>
 </body>
 </html>
